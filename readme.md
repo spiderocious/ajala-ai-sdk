@@ -47,15 +47,30 @@ const ai = ajala.initialize({
 const result = await ai.prompt('Get weather for {{city}}', {
   expectJson: true,
   jsonStructure: {
-    temperature: "number",
-    condition: "string",
-    humidity: "number"
-  }
+    temperature: {
+      type: "number",
+      minimum: -50,
+      maximum: 60,
+      description: "Temperature in Celsius"
+    },
+    condition: {
+      type: "string",
+      enum: ["sunny", "cloudy", "rainy", "snowy"],
+      description: "Weather condition"
+    },
+    humidity: {
+      type: "number",
+      minimum: 0,
+      maximum: 100,
+      description: "Humidity percentage"
+    }
+  },
+  validateJSON: true
 }, {
   city: "San Francisco"
 })
 
-console.log(result) // { temperature: 72, condition: "sunny", humidity: 45 }
+console.log(result) // { temperature: 22, condition: "sunny", humidity: 65 }
 ```
 
 ## API Reference
@@ -172,7 +187,7 @@ const story = await ai.prompt('Write a short story about {{topic}}', {}, {
 console.log(story) // Returns the generated story as a string
 ```
 
-### Structured JSON Response
+### Advanced JSON Validation
 
 ```javascript
 const analysis = await ai.prompt(
@@ -180,11 +195,47 @@ const analysis = await ai.prompt(
   {
     expectJson: true,
     jsonStructure: {
-      sentiment: "string",
-      confidence: "number",
-      keywords: "array"
+      sentiment: {
+        type: "string",
+        enum: ["positive", "negative", "neutral"],
+        description: "The sentiment of the text",
+        required: true
+      },
+      confidence: {
+        type: "number",
+        minimum: 0,
+        maximum: 1,
+        description: "Confidence score between 0 and 1",
+        required: true
+      },
+      keywords: {
+        type: "array",
+        items: {
+          type: "string",
+          minLength: 2,
+          maxLength: 20
+        },
+        minItems: 1,
+        uniqueItems: true,
+        description: "Key words found in the text"
+      },
+      entities: {
+        type: "object",
+        properties: {
+          people: {
+            type: "array",
+            items: { type: "string" }
+          },
+          places: {
+            type: "array", 
+            items: { type: "string" }
+          }
+        },
+        additionalProperties: false
+      }
     },
-    validateJSON: true
+    validateJSON: true,
+    errorOnInvalidJSON: true
   },
   {
     text: "I absolutely love this new feature!"
@@ -195,7 +246,8 @@ console.log(analysis)
 // {
 //   sentiment: "positive",
 //   confidence: 0.95,
-//   keywords: ["love", "feature", "new"]
+//   keywords: ["love", "feature", "new"],
+//   entities: { people: [], places: [] }
 // }
 ```
 
@@ -221,7 +273,17 @@ try {
     expectJson: true,
     validateJSON: true,
     errorOnInvalidJSON: true,
-    jsonStructure: { result: "string", status: "number" }
+    jsonStructure: { 
+      result: {
+        type: "string",
+        required: true
+      }, 
+      status: {
+        type: "number",
+        minimum: 0,
+        maximum: 999
+      }
+    }
   }, {
     data: "some input"
   })
