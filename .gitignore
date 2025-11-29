@@ -6,3 +6,5 @@ dist
 .env.local
 .env.development.local
 build
+.rollup.cache
+node_modules/

@@ -3,6 +3,11 @@ export const PROVIDERS = {
   OPENAI: 'openai',
 } as const;
 
+export enum SupportedProviders {
+  CLAUDE = 'claude',
+  OPENAI = 'openai',
+}
+
 export const PROVIDER_MODELS = {
   [PROVIDERS.CLAUDE]: {
     CLAUDE_3_SONNET: 'claude-3-sonnet-20240229',
