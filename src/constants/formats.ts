@@ -39,3 +39,8 @@ export const FORMAT_ERROR_MESSAGES = {
 } as const;
 
 export type FormatType = keyof typeof FORMAT_VALIDATORS;
+export const FORMATS = {
+  patterns: FORMAT_PATTERNS,
+  validators: FORMAT_VALIDATORS,
+  errorMessages: FORMAT_ERROR_MESSAGES,
+} as const;

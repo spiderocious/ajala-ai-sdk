@@ -31,7 +31,7 @@ module.exports = {
       statements: 80
     }
   },
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/core/(.*)$': '<rootDir>/src/core/$1',
     '^@/providers/(.*)$': '<rootDir>/src/providers/$1',
@@ -39,6 +39,15 @@ module.exports = {
     '^@/middleware/(.*)$': '<rootDir>/src/middleware/$1',
     '^@/constants/(.*)$': '<rootDir>/src/constants/$1',
     '^@/types/(.*)$': '<rootDir>/src/types/$1'
+  },
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        moduleResolution: 'node',
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true
+      }
+    }
   },
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
   testTimeout: 10000,

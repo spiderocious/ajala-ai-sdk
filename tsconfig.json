@@ -26,7 +26,6 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceRoot": "src",
-    "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
