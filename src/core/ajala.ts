@@ -7,6 +7,7 @@ import { PromptOptions } from '../types/provider';
 import { BaseProvider } from '../providers/base-provider';
 import { ClaudeProvider } from '../providers/claude/claude-provider';
 import { OpenAIProvider } from '../providers/openai/openai-provider';
+import { VariableInterpolator } from '../utils/variable-interpolator';
 
 export class Ajala {
   private config: AjalaConfig;
@@ -76,7 +77,7 @@ export class Ajala {
   /**
    * Send a prompt to AI and get text response
    *
-   * @param prompt - The prompt text
+   * @param prompt - The prompt text (can include {{variables}})
    * @param options - Prompt options
    * @param variables - Variables for interpolation
    * @returns Text response from AI
@@ -86,8 +87,13 @@ export class Ajala {
     options: PromptOptions = {},
     variables?: Record<string, any>
   ): Promise<string> {
-    // Trim prompt if configured
+    // Apply variable substitution if variables provided
     let processedPrompt = prompt;
+    if (variables) {
+      processedPrompt = VariableInterpolator.interpolate(prompt, variables);
+    }
+
+    // Trim prompt if configured
     if (this.config.settings?.trimPrompt !== false) {
       processedPrompt = processedPrompt.trim();
     }
