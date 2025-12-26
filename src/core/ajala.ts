@@ -9,6 +9,8 @@ import { ClaudeProvider } from '../providers/claude/claude-provider';
 import { OpenAIProvider } from '../providers/openai/openai-provider';
 import { VariableInterpolator } from '../utils/variable-interpolator';
 import { JSONParser } from '../utils/json-parser';
+import { JSONValidator } from '../utils/json-validator';
+import { JsonStructure } from '../types/validation';
 
 export class Ajala {
   private config: AjalaConfig;
@@ -111,13 +113,34 @@ export class Ajala {
 
     // Parse JSON if requested
     if (options.expectJson) {
+      let parsedJson: any;
+
       try {
-        return JSONParser.parse(response.content, { autoFix: true });
+        parsedJson = JSONParser.parse(response.content, { autoFix: true });
       } catch (error) {
         throw new Error(
           `Failed to parse JSON response: ${error instanceof Error ? error.message : String(error)}`
         );
       }
+
+      // Validate JSON if schema provided
+      if (options.jsonStructure) {
+        const validationResult = JSONValidator.validate(parsedJson, options.jsonStructure as JsonStructure, {
+          useDefaults: true,
+          removeAdditional: false,
+        });
+
+        if (!validationResult.valid) {
+          const errors = validationResult.errors
+            .map(err => `${err.path}: ${err.message}`)
+            .join(', ');
+          throw new Error(`JSON validation failed: ${errors}`);
+        }
+
+        return validationResult.data;
+      }
+
+      return parsedJson;
     }
 
     // Return text content
