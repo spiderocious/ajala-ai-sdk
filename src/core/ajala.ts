@@ -8,6 +8,7 @@ import { BaseProvider } from '../providers/base-provider';
 import { ClaudeProvider } from '../providers/claude/claude-provider';
 import { OpenAIProvider } from '../providers/openai/openai-provider';
 import { VariableInterpolator } from '../utils/variable-interpolator';
+import { JSONParser } from '../utils/json-parser';
 
 export class Ajala {
   private config: AjalaConfig;
@@ -75,18 +76,18 @@ export class Ajala {
   }
 
   /**
-   * Send a prompt to AI and get text response
+   * Send a prompt to AI and get text response or JSON object
    *
    * @param prompt - The prompt text (can include {{variables}})
    * @param options - Prompt options
    * @param variables - Variables for interpolation
-   * @returns Text response from AI
+   * @returns Text response from AI or parsed JSON object
    */
   async prompt(
     prompt: string,
     options: PromptOptions = {},
     variables?: Record<string, any>
-  ): Promise<string> {
+  ): Promise<string | any> {
     // Apply variable substitution if variables provided
     let processedPrompt = prompt;
     if (variables) {
@@ -107,6 +108,17 @@ export class Ajala {
 
     // Send prompt to provider
     const response = await provider.sendPrompt(processedPrompt, options);
+
+    // Parse JSON if requested
+    if (options.expectJson) {
+      try {
+        return JSONParser.parse(response.content, { autoFix: true });
+      } catch (error) {
+        throw new Error(
+          `Failed to parse JSON response: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
 
     // Return text content
     return response.content;
