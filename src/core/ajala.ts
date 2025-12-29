@@ -72,7 +72,7 @@ export class Ajala {
 
       if (!this.defaultProvider && this.providers.size > 0) {
         // Use first available provider as default
-        this.defaultProvider = Array.from(this.providers.values())[0];
+        this.defaultProvider = Array.from(this.providers.values())[0] || null;
       }
     }
   }

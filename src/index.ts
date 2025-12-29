@@ -36,7 +36,3 @@ export { BaseProvider } from './providers/base-provider';
 // Export constants
 export { PROVIDERS, PROVIDER_MODELS, DEFAULT_MODELS } from './constants/providers';
 export { FORMATS } from './constants/formats';
-
-// Default export
-import { initialize } from './core/ajala';
-export default { initialize };
